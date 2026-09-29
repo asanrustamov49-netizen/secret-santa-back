@@ -13,7 +13,10 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.listen(env.port);
-  Logger.log(`API running on http://localhost:${env.port}/api`, 'Bootstrap');
+  Logger.log(
+    `API running at ${process.env.BACKEND_URL ?? `http://localhost:${env.port}`}/api`,
+    'Bootstrap',
+  );
 }
 
 void bootstrap();
