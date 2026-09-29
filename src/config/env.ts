@@ -60,7 +60,8 @@ function aiProvider(): AiProviderName {
 export const env = {
   isProduction,
   port: Number(process.env.PORT ?? 5000),
-  frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+  frontendUrl:
+    process.env.FRONTEND_URL ?? 'https://secret-santa-project-mu.vercel.app',
 
   databaseUrl: required('DATABASE_URL'),
   /** false for local PostgreSQL (no TLS), true for Supabase */
