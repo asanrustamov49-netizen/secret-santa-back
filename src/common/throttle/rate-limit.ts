@@ -42,6 +42,10 @@ export const RATE_LIMITS = {
   ai: { limit: 10, ttl: MINUTE },
   /** Starting a new AI conversation — no one needs dozens a minute */
   aiConversations: { limit: 20, ttl: MINUTE },
+  /** A message in an event chat: a lively conversation, never a flood */
+  chat: { limit: 20, ttl: MINUTE },
+  /** A realtime socket ticket: one per (re)connect — room for flaky networks, not for a loop */
+  realtime: { limit: 30, ttl: MINUTE },
 } as const;
 
 export type RateLimitPreset = keyof typeof RATE_LIMITS;

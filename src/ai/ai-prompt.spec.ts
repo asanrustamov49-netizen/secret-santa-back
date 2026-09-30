@@ -1,4 +1,5 @@
 import {
+  AI_ACTIONS,
   type AiContext,
   buildSystemPrompt,
   contextState,
@@ -79,6 +80,23 @@ describe('buildSystemPrompt', () => {
     for (const leak of ['Daniel', 'Football', 'Scarf']) {
       expect(prompt).not.toContain(leak);
     }
+  });
+
+  it('offers only the allowlisted settings buttons, applied by the user', () => {
+    const prompt = buildSystemPrompt(general, 'en', 'settings');
+    for (const action of AI_ACTIONS) {
+      expect(prompt).toContain(`[[action:${action}]]`);
+    }
+    expect(AI_ACTIONS).toEqual([
+      'theme:light',
+      'theme:dark',
+      'theme:system',
+      'language:ru',
+      'language:en',
+      'language:ky',
+    ]);
+    expect(prompt).toMatch(/nothing changes until the user presses it/);
+    expect(prompt).toContain('EVENT CHAT');
   });
 
   it('is identical for the same context, language and page (cacheable)', () => {

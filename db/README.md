@@ -6,7 +6,9 @@ Plain SQL, applied by hand. No ORM, no migration tool.
 db/
 └── migrations/
     ├── 001_init.sql   ← all tables, enums, indexes, triggers, RLS
-    └── 002_ai.sql     ← AI gift assistant: ai_conversations, ai_messages
+    ├── 002_ai.sql     ← AI gift assistant: ai_conversations, ai_messages
+    ├── 003_ai_general.sql ← general AI conversations (event_id nullable)
+    └── 004_event_chat.sql ← event chat: event_messages
 ```
 
 ## Apply on Supabase
@@ -43,6 +45,7 @@ DATABASE_SSL=true
 | `matches` | giver → receiver after the draw |
 | `ai_conversations` | A user's AI gift-assistant chat about one event (002_ai) |
 | `ai_messages` | The chat's user / assistant messages, sent back to the model as history (002_ai) |
+| `event_messages` | The event chat: what participants write to each other once names are drawn (004_event_chat) |
 
 Rules the schema itself enforces:
 

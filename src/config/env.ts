@@ -57,11 +57,28 @@ function aiProvider(): AiProviderName {
   );
 }
 
+/** FRONTEND_URL + CORS_ORIGINS, as bare origins (no path, no trailing slash) */
+function corsOrigins(): string[] {
+  const frontend =
+    process.env.FRONTEND_URL ?? 'https://secret-santa-project-mu.vercel.app';
+  const extra = (process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return [...new Set([frontend, ...extra].map((url) => new URL(url).origin))];
+}
+
 export const env = {
   isProduction,
   port: Number(process.env.PORT ?? 5000),
   frontendUrl:
     process.env.FRONTEND_URL ?? 'https://secret-santa-project-mu.vercel.app',
+  /**
+   * Browser origins allowed to open the realtime socket: FRONTEND_URL plus any in
+   * CORS_ORIGINS (comma-separated, e.g. http://localhost:3000 next to the Vercel site).
+   * Never "*": the socket is authenticated.
+   */
+  corsOrigins: corsOrigins(),
 
   databaseUrl: required('DATABASE_URL'),
   /** false for local PostgreSQL (no TLS), true for Supabase */

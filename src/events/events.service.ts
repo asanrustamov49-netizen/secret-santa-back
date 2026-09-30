@@ -236,8 +236,9 @@ export class EventsService {
   ) {
     await this.requireOwner(userId, eventId);
     // Under the same row lock the draw takes: a removal can't slip in mid-draw
-    // (it would cascade-delete that person's pairs and break the gift circle)
-    await this.db.transaction(async (tx) => {
+    // (it would cascade-delete that person's pairs and break the gift circle).
+    // Returns who was removed, so their open tabs can stop listening to this event.
+    return this.db.transaction(async (tx) => {
       await this.lockOpenEvent(
         tx,
         eventId,
@@ -247,11 +248,12 @@ export class EventsService {
         `delete from participants p
          using events e
          where p.id = $1 and p.event_id = $2 and e.id = p.event_id and p.user_id <> e.owner_id
-         returning p.id`,
+         returning p.user_id as "userId"`,
         [participantId, eventId],
       );
       if (removed.length === 0)
         throw new NotFoundException('Participant not found');
+      return (removed[0] as { userId: string }).userId;
     });
   }
 

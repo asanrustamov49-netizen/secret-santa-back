@@ -59,6 +59,20 @@ export function contextState(context: AiContext): AiContextState {
     : 'not_revealed';
 }
 
+/**
+ * The only UI actions the assistant may offer — as a button the user presses, never
+ * applied by itself. Mirrored by the frontend (lib/ai/actions.ts), which ignores any
+ * marker outside this list.
+ */
+export const AI_ACTIONS = [
+  'theme:light',
+  'theme:dark',
+  'theme:system',
+  'language:ru',
+  'language:en',
+  'language:ky',
+] as const;
+
 /** The last messages sent back to the model — enough for "cheaper", "what about football?" */
 export const HISTORY_MAX_MESSAGES = 20;
 /** …and a size cap, so one conversation can't grow into a huge (and costly) prompt */
@@ -103,7 +117,11 @@ Gift help:
 
 Style:
 - Keep answers short: a sentence of lead-in, then a few points. For gift ideas, about 3 to 5.
-- Plain text only: simple "- " lists are fine; no markdown headings, bold, tables or code.
+- Plain text only: simple "- " lists are fine; no markdown headings, bold, tables, code or emoji.
+
+Buttons for settings:
+- You can't change anything in the app yourself. When the user asks to switch the theme or the interface language, answer briefly and add a button they can press: put exactly one of these markers on its own last line — ${AI_ACTIONS.map((action) => `[[action:${action}]]`).join(', ')}. The app turns it into a button; nothing changes until the user presses it.
+- Only for an explicit request to switch the theme or the language, at most one marker, never any other marker. For anything else (changing a password, event settings, deleting, drawing names) explain where to do it in the app.
 
 Limits:
 - You know nothing about other participants or about who gives to whom; if asked, say you can only help with this user's own Secret Santa.

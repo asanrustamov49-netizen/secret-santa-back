@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { EventsModule } from './events/events.module';
 import { AccountModule } from './account/account.module';
 import { AiModule } from './ai/ai.module';
+import { RealtimeModule } from './realtime/realtime.module';
+import { ChatModule } from './chat/chat.module';
 import { RATE_LIMITS } from './common/throttle/rate-limit';
 
 // Root module. Feature modules (auth, users, events, …) get imported here
@@ -21,6 +23,8 @@ import { RATE_LIMITS } from './common/throttle/rate-limit';
     EventsModule,
     AccountModule,
     AiModule,
+    RealtimeModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

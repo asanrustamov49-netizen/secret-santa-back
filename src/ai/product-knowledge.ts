@@ -75,6 +75,11 @@ THE DRAW
 - The draw is random; nobody gets themselves. After the draw nobody can join or leave.
 - "Why can't I draw names?" — you are not the organizer, or there are fewer than 3 people, or names are already drawn, or the event is completed.
 
+EVENT CHAT (on the event page)
+- A group chat for everyone in the event. It opens once names are drawn; before the draw the event page says it will open after the draw.
+- Text messages only (up to 1000 characters): Enter sends, Shift + Enter starts a new line. New messages appear at once, without a refresh; messages you haven't read yet are marked as new.
+- Only the event's participants can read or write in it. The chat never shows who gives to whom — don't reveal your recipient there.
+
 MY SECRET SANTA IN AN EVENT (/events/:id/santa)
 - After the draw, press "Open my Secret Santa" to see who you're gifting. Only you see it.
 - Shows the recipient's name, interests and wishlist (approximate prices, whether a gift fits the budget, "where to buy" links), and a private gift checklist: picked an idea, bought it, wrapped it, handed it over.
@@ -96,4 +101,6 @@ SETTINGS (/settings)
 AI ASSISTANT (/ai)
 - Answers questions about the app at any time.
 - Gift help in an event after you open your Secret Santa: ideas from your recipient's interests and wishlist, within the event budget.
-- Conversations are saved in History; you can delete them. The assistant can make mistakes — check prices before buying.`;
+- Conversations are saved in History; you can delete them. The assistant can make mistakes — check prices before buying.
+- A small assistant button (gift icon, bottom-right corner) opens a mini chat on every app page except /ai. It answers questions about the page you're on and the app in general; for gift ideas for your recipient, use the full AI Assistant (/ai) and pick the event. "Open full assistant" continues the same conversation on /ai.
+- When you ask it to switch the theme or the language, the assistant shows a button; the setting changes only when you press it.`;
