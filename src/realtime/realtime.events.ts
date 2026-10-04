@@ -4,8 +4,10 @@
 // changed, never what changed or who. The client then refetches through the REST
 // API, which applies all the usual access rules (above all: my recipient only, and
 // only once I opened my match). So no socket message can ever carry a pair.
-// The single exception is a chat message (ChatRealtimeEvent below): plain text the
-// participants wrote to each other, delivered only to the event's own room.
+// The exceptions are chat messages: the event chat (ChatRealtimeEvent below) — plain
+// text the participants wrote to each other, delivered only to the event's own room —
+// and the anonymous Secret Santa chat (SantaChatRealtimeEvent), delivered only to the
+// two people of one pair, each through their own user room.
 
 /** Server → client */
 export const RealtimeEvent = {
@@ -45,11 +47,43 @@ export interface RealtimePayload {
  * the text, when, and the author's name and picture (as in the participants list).
  * The chat never reads the matches table, so it can't carry a pair either.
  */
-export const ChatRealtimeEvent = { message: 'chat:message' } as const;
+export const ChatRealtimeEvent = {
+  message: 'chat:message',
+  /** To my own tabs only: I read this event's chat — { eventId } */
+  read: 'chat:read',
+} as const;
 
 export interface ChatRealtimePayload<Message = unknown> {
   eventId: string;
   message: Message;
+}
+
+/**
+ * The anonymous Secret Santa chat. Never sent to an event room: each side gets its
+ * own copy in its own user room, worded for it — "mine / not mine", with no author
+ * id, name or picture. So the recipient's copy can't tell them who their Santa is.
+ */
+export const SantaChatRealtimeEvent = {
+  /** A new message in one of my Secret Santa chats */
+  message: 'santa-chat:message',
+  /** I read a chat in another tab: my unread badges change */
+  read: 'santa-chat:read',
+} as const;
+
+/** sender — I'm the Santa (I know who I write to) · recipient — my Santa writes to me */
+export type SantaChatRole = 'sender' | 'recipient';
+
+export interface SantaChatRealtimePayload<Message = unknown> {
+  chatId: string;
+  eventId: string;
+  /** The receiving user's own role in this chat */
+  role: SantaChatRole;
+  message: Message;
+}
+
+export interface SantaChatReadPayload {
+  eventId: string;
+  role: SantaChatRole;
 }
 
 /** Client → server */

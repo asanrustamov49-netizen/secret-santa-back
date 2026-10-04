@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Header,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -50,5 +51,27 @@ export class ChatController {
     const message = await this.chat.send(me.id, id, dto.content);
     this.realtime.chatMessage(id, message);
     return { message };
+  }
+
+  /** I've read this chat up to now — kept by the API, so badges agree on every device */
+  @Post('read')
+  @HttpCode(204)
+  @RateLimit('chatRead')
+  async read(@CurrentUser() me: AuthUser, @EventId() id: string) {
+    await this.chat.markRead(me.id, id);
+    this.realtime.chatRead(me.id, id);
+  }
+}
+
+/** /api/chats — across my event chats */
+@Controller('chats')
+export class ChatsController {
+  constructor(private readonly chat: ChatService) {}
+
+  /** Unread counts per event chat (only those with any) */
+  @Get('unread')
+  @Header('Cache-Control', 'no-store')
+  async unread(@CurrentUser() me: AuthUser) {
+    return { chats: await this.chat.unread(me.id) };
   }
 }

@@ -8,7 +8,9 @@ db/
     ├── 001_init.sql   ← all tables, enums, indexes, triggers, RLS
     ├── 002_ai.sql     ← AI gift assistant: ai_conversations, ai_messages
     ├── 003_ai_general.sql ← general AI conversations (event_id nullable)
-    └── 004_event_chat.sql ← event chat: event_messages
+    ├── 004_event_chat.sql ← event chat: event_messages
+    ├── 005_secret_santa_chat.sql ← anonymous Santa ↔ recipient chat
+    └── 006_event_chat_reads.sql ← event chat "read up to" (unread badges)
 ```
 
 ## Apply on Supabase
@@ -46,6 +48,9 @@ DATABASE_SSL=true
 | `ai_conversations` | A user's AI gift-assistant chat about one event (002_ai) |
 | `ai_messages` | The chat's user / assistant messages, sent back to the model as history (002_ai) |
 | `event_messages` | The event chat: what participants write to each other once names are drawn (004_event_chat) |
+| `secret_santa_chats` | One anonymous gift chat per pair of the draw, opened by the Santa's first message (005_secret_santa_chat) |
+| `event_chat_reads` | When each person last read each event chat — unread counts for badges (006_event_chat_reads) |
+| `secret_santa_messages` | Its messages; the author id never leaves the API — the recipient never learns who their Santa is (005_secret_santa_chat) |
 
 Rules the schema itself enforces:
 

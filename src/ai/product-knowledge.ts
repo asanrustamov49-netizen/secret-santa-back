@@ -79,6 +79,7 @@ EVENT CHAT (on the event page)
 - A group chat for everyone in the event. It opens once names are drawn; before the draw the event page says it will open after the draw.
 - Text messages only (up to 1000 characters): Enter sends, Shift + Enter starts a new line. New messages appear at once, without a refresh; messages you haven't read yet are marked as new.
 - Only the event's participants can read or write in it. The chat never shows who gives to whom — don't reveal your recipient there.
+- When someone writes while you are on another page, a notice "New message in <event>" appears with "Open chat"; unread event chat messages are counted on the My Events menu item, the same on all your devices.
 
 MY SECRET SANTA IN AN EVENT (/events/:id/santa)
 - After the draw, press "Open my Secret Santa" to see who you're gifting. Only you see it.
@@ -86,6 +87,13 @@ MY SECRET SANTA IN AN EVENT (/events/:id/santa)
 
 MY SECRET SANTA (/my-santa)
 - Your recipients across all events: still-wrapped ones (tap to reveal) and opened ones with a link to their wishlist.
+- If your own Secret Santa wrote to you, "Your Secret Santa wrote to you" lists those chats here.
+
+ANONYMOUS GIFT CHAT (Secret Santa ↔ recipient)
+- After opening your Secret Santa, press "Write about the gift" (on your recipient's page or their card in My Secret Santa) to ask them about the gift privately.
+- Your recipient sees only "Your Secret Santa" — never your name, picture or anything else about you. They can answer, and the answer comes back to you. You, in turn, never learn who your own Secret Santa is.
+- Only the Santa can start the chat; the recipient can answer once their Santa has written. New messages arrive at once; on other pages a notice "Your Secret Santa wrote to you about the gift" appears with a "Reply" button, and the My Secret Santa menu item shows unread messages.
+- The chat opens after the draw and becomes read-only once the event is completed. It is separate from the event chat, and nobody else — not even the organizer — can read it.
 
 PROFILE (/profile)
 - Your name, interests (up to 20, each up to 30 characters, with suggestions) and wishlist (up to 30 gifts: a name up to 120 characters, an approximate price in som, an optional link).
@@ -97,6 +105,10 @@ SETTINGS (/settings)
 - Language: Русский, English or Кыргызча — for the whole site; remembered on this device.
 - Password: change it (logs you out on other devices), or, if you signed in with Google, set one after Google confirms it's you.
 - Sessions: log out, or log out of all other devices.
+- Help: "How Secret Santa works" reopens the product tour; links to the Terms of Service and the Privacy Policy.
+
+PRODUCT TOUR
+- On the first visit to any page of the site, a small "New here?" card offers a short tour (11 steps: events, invites, wishlists, the draw, My Secret Santa, the anonymous gift chat, the event chat, AI gift ideas, notifications). It shows once per device; reopen it in Settings → Help or with "How Secret Santa works" in the site footer.
 
 AI ASSISTANT (/ai)
 - Answers questions about the app at any time.

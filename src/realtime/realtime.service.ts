@@ -7,6 +7,9 @@ import {
   eventRoom,
   type RealtimeEventName,
   type RealtimePayload,
+  SantaChatRealtimeEvent,
+  type SantaChatReadPayload,
+  type SantaChatRealtimePayload,
   userRoom,
 } from './realtime.events';
 
@@ -54,6 +57,25 @@ export class RealtimeService {
     }
   }
 
+  /** I read an event chat: my other tabs drop its unread badge */
+  chatRead(userId: string, eventId: string) {
+    const payload: RealtimePayload = { eventId };
+    this.emitTo(userRoom(userId), ChatRealtimeEvent.read, payload);
+  }
+
+  /**
+   * A Secret Santa chat message to one person, all their tabs. The caller builds a
+   * separate payload for each side (isMine differs); none of them names the author.
+   */
+  santaChatMessage(userId: string, payload: SantaChatRealtimePayload) {
+    this.emitTo(userRoom(userId), SantaChatRealtimeEvent.message, payload);
+  }
+
+  /** I read a Secret Santa chat: my other tabs drop its unread badge */
+  santaChatRead(userId: string, payload: SantaChatReadPayload) {
+    this.emitTo(userRoom(userId), SantaChatRealtimeEvent.read, payload);
+  }
+
   /** All tabs of one user */
   toUser(userId: string, event: RealtimeEventName, eventId: string) {
     this.emit(userRoom(userId), event, eventId);
@@ -94,9 +116,13 @@ export class RealtimeService {
   }
 
   private emit(room: string, event: RealtimeEventName, eventId: string) {
+    const payload: RealtimePayload = { eventId };
+    this.emitTo(room, event, payload);
+  }
+
+  private emitTo(room: string, event: string, payload: object) {
     if (!this.server) return;
     try {
-      const payload: RealtimePayload = { eventId };
       this.server.to(room).emit(event, payload);
     } catch (error) {
       this.logger.warn(

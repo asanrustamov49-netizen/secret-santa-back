@@ -215,6 +215,32 @@ describe('Event chat (e2e)', () => {
     await b.agent.get(messagesOf(eventId, '?limit=5')).expect(400);
   });
 
+  it('keeps unread per person and clears it on read — on every tab of the reader', async () => {
+    // Needs db/migrations/006_event_chat_reads.sql
+    type Unread = { chats: { eventId: string; unread: number }[] };
+    const unreadOf = async (user: User) =>
+      ((await user.agent.get('/api/chats/unread').expect(200)).body as Unread)
+        .chats;
+
+    // a wrote the 50 old ones; b and c wrote one each
+    expect(await unreadOf(a)).toEqual([
+      expect.objectContaining({ eventId, unread: 2 }),
+    ]);
+    expect(await unreadOf(d)).toEqual([]);
+
+    const socketA = await connect(a);
+    const readElsewhere = next(socketA, ChatRealtimeEvent.read);
+    await a.agent.post(messagesOf(eventId, '/read')).expect(204);
+    expect(await readElsewhere).toEqual({ eventId });
+    expect(await unreadOf(a)).toEqual([]);
+
+    // Nobody else's count moved
+    expect(await unreadOf(b)).toEqual([
+      expect.objectContaining({ eventId, unread: CHAT_PAGE_SIZE + 1 }),
+    ]);
+    await d.agent.post(messagesOf(eventId, '/read')).expect(404);
+  });
+
   it('validates messages', async () => {
     for (const content of ['', '   ', 'x'.repeat(1001), { text: 'hi' }, 42]) {
       await b.agent.post(messagesOf(eventId)).send({ content }).expect(400);

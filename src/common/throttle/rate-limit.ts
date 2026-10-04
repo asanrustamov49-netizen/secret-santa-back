@@ -44,6 +44,8 @@ export const RATE_LIMITS = {
   aiConversations: { limit: 20, ttl: MINUTE },
   /** A message in an event chat: a lively conversation, never a flood */
   chat: { limit: 20, ttl: MINUTE },
+  /** "I've read it" — sent on opening a chat and as messages arrive while it's open */
+  chatRead: { limit: 60, ttl: MINUTE },
   /** A realtime socket ticket: one per (re)connect — room for flaky networks, not for a loop */
   realtime: { limit: 30, ttl: MINUTE },
 } as const;

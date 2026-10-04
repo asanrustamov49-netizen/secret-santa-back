@@ -77,6 +77,39 @@ export class ChatService {
     return message;
   }
 
+  /** I've read the chat up to now: others' later messages are unread again */
+  async markRead(userId: string, eventId: string) {
+    await this.requireOpenChat(userId, eventId);
+    await this.db.query(
+      `insert into event_chat_reads (user_id, event_id) values ($1, $2)
+       on conflict (user_id, event_id) do update set last_read_at = now()`,
+      [userId, eventId],
+    );
+  }
+
+  /**
+   * Unread messages by others, per event chat of mine that has any — for badges and
+   * notices. Counts only: nobody's name or text, and only chats I can open.
+   */
+  unread(userId: string) {
+    return this.db.query<{
+      eventId: string;
+      eventName: string;
+      unread: number;
+    }>(
+      `select e.id as "eventId", e.name as "eventName", count(m.id)::int as unread
+       from participants p
+       join events e on e.id = p.event_id and e.status <> 'open'
+       left join event_chat_reads r on r.user_id = p.user_id and r.event_id = p.event_id
+       join event_messages m on m.event_id = p.event_id and m.user_id <> p.user_id
+         and m.created_at > coalesce(r.last_read_at, '-infinity'::timestamptz)
+       where p.user_id = $1
+       group by e.id, e.name
+       order by max(m.created_at) desc`,
+      [userId],
+    );
+  }
+
   /** 404 unless I take part in the event; 409 while names aren't drawn yet */
   private async requireOpenChat(userId: string, eventId: string) {
     const event = await this.events.get(userId, eventId);
