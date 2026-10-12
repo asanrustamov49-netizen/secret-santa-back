@@ -57,6 +57,7 @@ CREATE EVENT (/events/new) — four steps
 
 INVITING PEOPLE
 - On the event page, copy or share the invite link. Anyone with the link can join until names are drawn.
+- Shared in a messenger (Telegram, WhatsApp…), the invite link shows a preview card with the event name, its day, the budget and how many have joined.
 - The organizer can replace the link ("New invite link" in Manage event); the old link stops working.
 
 JOINING
@@ -67,6 +68,7 @@ JOINING
 EVENT PAGE (/events/:id)
 - Status: Gathering people → Names drawn → Completed. Number of people, and how many are "ready" (shared at least one interest or wishlist gift).
 - Participants list, the invite link, and a card with the next step.
+- "Add to calendar" next to the gift exchange day (when a date is set and the event isn't completed): downloads a calendar file for Google Calendar, Apple Calendar or Outlook, with a reminder 3 days before.
 - A participant (not the organizer) can leave the event until names are drawn.
 - Manage event (organizer only): edit name, description, gift exchange day, budget and max participants (until the event is completed); replace the invite link; remove participants (before the draw); mark the event completed after the gifts are exchanged (it moves to past events); delete the event for everyone (can't be undone). The organizer can't leave — they delete the event instead.
 
