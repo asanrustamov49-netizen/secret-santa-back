@@ -31,6 +31,8 @@ const MINUTE = 60_000;
 export const RATE_LIMITS = {
   /** Saving settings: generous, a person clicking toggles never hits it */
   preferences: { limit: 30, ttl: MINUTE },
+  /** Profile and wishlist edits — each one is announced to every event I take part in */
+  profile: { limit: 30, ttl: MINUTE },
   /** Session management such as "log out everywhere" */
   sessions: { limit: 5, ttl: MINUTE },
   /** Password change, account deletion — anything worth guessing at */

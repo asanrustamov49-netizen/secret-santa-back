@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from '../common/auth/current-user.decorator';
 import type { AuthUser } from '../common/auth/auth.types';
+import { RateLimit } from '../common/throttle/rate-limit';
 import { RealtimeEvent } from '../realtime/realtime.events';
 import { RealtimeService } from '../realtime/realtime.service';
 import { UpdateProfileDto, WishlistItemDto } from './dto/profile.dto';
@@ -42,6 +43,7 @@ export class UsersController {
   }
 
   @Patch()
+  @RateLimit('profile')
   async update(@CurrentUser() me: AuthUser, @Body() dto: UpdateProfileDto) {
     const user = await this.users.updateProfile(me.id, dto);
     if (!user) throw new NotFoundException('Account not found');
@@ -55,6 +57,7 @@ export class UsersController {
   }
 
   @Post('wishlist')
+  @RateLimit('profile')
   async addWishlistItem(
     @CurrentUser() me: AuthUser,
     @Body() dto: WishlistItemDto,
@@ -65,6 +68,7 @@ export class UsersController {
   }
 
   @Put('wishlist/:id')
+  @RateLimit('profile')
   async updateWishlistItem(
     @CurrentUser() me: AuthUser,
     @Param('id', ParseUUIDPipe) id: string,
@@ -76,6 +80,7 @@ export class UsersController {
   }
 
   @Delete('wishlist/:id')
+  @RateLimit('profile')
   @HttpCode(204)
   async removeWishlistItem(
     @CurrentUser() me: AuthUser,
