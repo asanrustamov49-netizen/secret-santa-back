@@ -5,6 +5,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
+import { AuthRateLimitService } from './../src/auth/auth-rate-limit';
 import { AuthController } from './../src/auth/auth.controller';
 import { AuthService } from './../src/auth/auth.service';
 import { GoogleAuthGuard } from './../src/auth/google-auth.guard';
@@ -107,13 +108,15 @@ describe('Google sign-in never auto-links by email (e2e)', () => {
     sessionsCreated = 0;
 
     const moduleRef = await Test.createTestingModule({
-      // AuthController has rate-limited routes (logout-all)
+      // AuthController has rate-limited routes (logout-all; login and register
+      // through AuthRateLimitService, which these Google-only tests never reach)
       imports: [ThrottlerModule.forRoot([])],
       controllers: [AuthController],
       providers: [
         AuthService,
         SessionsService,
         ReauthService,
+        AuthRateLimitService,
         { provide: UsersService, useValue: fakeUsers },
         { provide: DatabaseService, useValue: fakeDb },
         { provide: JwtService, useValue: new JwtService() },

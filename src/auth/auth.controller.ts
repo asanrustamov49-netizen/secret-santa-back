@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Headers,
   HttpCode,
   Logger,
@@ -26,6 +27,8 @@ import {
   GoogleSignInError,
   RefreshRaceError,
 } from './auth.service';
+import { AuthRateLimit } from './auth-rate-limit';
+import { inspectClientIp } from './client-ip';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { GoogleAuthGuard } from './google-auth.guard';
 import {
@@ -64,6 +67,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @AuthRateLimit('register')
   async register(
     @Body() dto: RegisterDto,
     @Headers('user-agent') userAgent: string | undefined,
@@ -77,6 +81,7 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(200)
+  @AuthRateLimit('login')
   async login(
     @Body() dto: LoginDto,
     @Headers('user-agent') userAgent: string | undefined,
@@ -85,6 +90,25 @@ export class AuthController {
     const { user, ...tokens } = await this.auth.login(dto, userAgent);
     setAuthCookies(res, tokens);
     return { user };
+  }
+
+  /**
+   * Set-up check for the sign-in limits: did this request arrive with a valid client-IP
+   * signature? The Next.js proxy signs it exactly like /login, so after a deploy
+   * https://<site>/api/auth/client-ip-check answering "valid" shows that Vercel and this
+   * API share CLIENT_IP_SIGNING_SECRET. Only the status leaves — never the IP, the
+   * headers or anything about the key.
+   */
+  @Public()
+  @Get('client-ip-check')
+  @Header('Cache-Control', 'no-store')
+  clientIpCheck(@Req() req: Request) {
+    const { status } = inspectClientIp(
+      req.headers,
+      env.clientIpSigningSecret,
+      Date.now(),
+    );
+    return { signature: status };
   }
 
   @Public()

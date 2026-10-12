@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { clientIpSigningSecret } from './signing-secret';
 
 // Load .env into process.env (built into Node >= 20.12, no dotenv needed).
 // In production the variables come from the environment itself, so a missing file is fine.
@@ -57,6 +58,19 @@ function aiProvider(): AiProviderName {
   );
 }
 
+/** A positive whole number; unset → fallback; anything else is a config error */
+function positiveInt(name: string, fallback: number): number {
+  const raw = process.env[name]?.trim();
+  if (!raw) return fallback;
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(
+      `Invalid ${name}: "${process.env[name]}" (expected a whole number > 0)`,
+    );
+  }
+  return value;
+}
+
 /** FRONTEND_URL + CORS_ORIGINS, as bare origins (no path, no trailing slash) */
 function corsOrigins(): string[] {
   const frontend =
@@ -93,6 +107,34 @@ export const env = {
   accessTokenTtlSeconds: 15 * 60,
   refreshTokenTtlDays: 30,
 
+  /**
+   * Shared with the Next.js proxy, which signs the visitor's IP (as Vercel saw it)
+   * for /auth/login and /auth/register. Required in production, where a missing or
+   * weak value stops the start-up (see config/signing-secret.ts); optional elsewhere —
+   * then no IP is trusted and all sign-ins share the "unverified" limits. Never logged.
+   */
+  clientIpSigningSecret: clientIpSigningSecret(
+    process.env.CLIENT_IP_SIGNING_SECRET,
+    isProduction,
+  ),
+
+  /**
+   * Sign-in / sign-up limits, counted in PostgreSQL across all API instances.
+   * Per signed IP, and for everything without a valid signature together.
+   */
+  authRateLimits: {
+    login: {
+      limit: positiveInt('AUTH_LOGIN_LIMIT', 30),
+      unverifiedLimit: positiveInt('AUTH_UNVERIFIED_LOGIN_LIMIT', 60),
+      windowSeconds: positiveInt('AUTH_LOGIN_WINDOW_SECONDS', 15 * 60),
+    },
+    register: {
+      limit: positiveInt('AUTH_REGISTER_LIMIT', 10),
+      unverifiedLimit: positiveInt('AUTH_UNVERIFIED_REGISTER_LIMIT', 20),
+      windowSeconds: positiveInt('AUTH_REGISTER_WINDOW_SECONDS', 60 * 60),
+    },
+  },
+
   google: googleOAuth(),
   /** How long the user has to finish the Google consent screen */
   googleStateTtlSeconds: 10 * 60,
@@ -114,5 +156,13 @@ if (!Number.isInteger(env.port) || env.port <= 0) {
 if (isProduction && env.jwtAccessSecret.length < 32) {
   throw new Error(
     'JWT_ACCESS_SECRET must be at least 32 characters in production',
+  );
+}
+
+if (process.env.RENDER === 'true' && !isProduction) {
+  // Render sets RENDER=true on its services; without NODE_ENV=production the cookies lose
+  // Secure and every production check above (JWT length, CLIENT_IP_SIGNING_SECRET) is off
+  console.warn(
+    'Running on Render without NODE_ENV=production: cookies are not Secure and production checks are off',
   );
 }

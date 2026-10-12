@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { env } from '../config/env';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
+import { AuthRateLimitGuard, AuthRateLimitService } from './auth-rate-limit';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './google.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -17,6 +18,9 @@ import { SessionsService } from './sessions.service';
     AuthService,
     SessionsService,
     ReauthService,
+    // Shared sign-in / sign-up limits (@AuthRateLimit on /auth/login and /auth/register)
+    AuthRateLimitService,
+    AuthRateLimitGuard,
     // Every route in the app requires sign-in unless marked @Public()
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     // Without credentials there is no strategy; /auth/google then reports ?error=google

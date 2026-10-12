@@ -10,3 +10,10 @@ if (existsSync('.env')) {
     process.env[key] ??= value;
   }
 }
+
+// Every suite signs up and logs in many accounts from one address, all in the shared
+// "unverified" bucket: generous limits here, unless the shell sets its own.
+process.env.AUTH_LOGIN_LIMIT ??= '100000';
+process.env.AUTH_REGISTER_LIMIT ??= '100000';
+process.env.AUTH_UNVERIFIED_LOGIN_LIMIT ??= '100000';
+process.env.AUTH_UNVERIFIED_REGISTER_LIMIT ??= '100000';
