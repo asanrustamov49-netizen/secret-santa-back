@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { DatabaseService, type Queryable } from '../database/database.service';
 
@@ -15,7 +15,28 @@ export const hashRefreshToken = (token: string) =>
  */
 @Injectable()
 export class SessionsService {
+  private readonly logger = new Logger(SessionsService.name);
+
   constructor(private readonly db: DatabaseService) {}
+
+  /**
+   * Every sign-in and every refresh adds a row, so expired ones are swept now and then
+   * (AuthService calls this on a fraction of new sessions). An expired row decides
+   * nothing any more — refresh rejects it before the reuse check, and every lookup asks
+   * for expires_at > now() — so deleting it a day later changes no answer.
+   */
+  async purgeExpired() {
+    try {
+      await this.db.query(
+        `delete from refresh_tokens where expires_at < now() - interval '1 day'`,
+      );
+    } catch (error) {
+      // Housekeeping only: never fails the sign-in that triggered it
+      this.logger.warn(
+        `Expired session cleanup failed: ${error instanceof Error ? error.constructor.name : 'unknown'}`,
+      );
+    }
+  }
 
   /** Ends one session — the one this refresh token belongs to */
   async revokeToken(refreshToken: string, tx: Queryable = this.db) {

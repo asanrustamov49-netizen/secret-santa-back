@@ -376,7 +376,9 @@ export class EventsService {
     let revealedAt = match.revealedAt;
     if (reveal && !revealedAt) {
       const [row] = await this.db.query<{ revealedAt: Date }>(
-        `update matches set revealed_at = now() where id = $1 returning revealed_at as "revealedAt"`,
+        // A reveal from another tab may have landed in between: the first time stays
+        `update matches set revealed_at = coalesce(revealed_at, now()) where id = $1
+         returning revealed_at as "revealedAt"`,
         [match.id],
       );
       revealedAt = row.revealedAt;
@@ -471,7 +473,6 @@ export class EventsService {
     return { ...preview, people };
   }
 
-  /** Idempotent: joining twice just returns the event */
   /**
    * Idempotent: joining twice just returns the event. The status + capacity check
    * and the insert run under the event row lock the draw also takes, so nobody can

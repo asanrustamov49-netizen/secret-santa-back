@@ -16,9 +16,13 @@ export interface ChatMessage {
 export const CHAT_PAGE_SIZE = 50;
 
 // Field by field, never a whole row: a column added to users later can't leak in
+// (m = a message row, u = its author)
+const MESSAGE_FIELDS = `
+  m.id, m.event_id as "eventId", m.content, m.created_at as "createdAt",
+  json_build_object('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) as author
+`;
 const MESSAGE_SQL = `
-  select m.id, m.event_id as "eventId", m.content, m.created_at as "createdAt",
-    json_build_object('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) as author
+  select ${MESSAGE_FIELDS}
   from event_messages m
   join users u on u.id = m.user_id
 `;
@@ -65,14 +69,15 @@ export class ChatService {
 
   async send(userId: string, eventId: string, content: string) {
     await this.requireOpenChat(userId, eventId);
-    const [row] = await this.db.query<{ id: string }>(
-      `insert into event_messages (event_id, user_id, content)
-       values ($1, $2, $3) returning id`,
-      [eventId, userId, content],
-    );
+    // One round trip: the new row comes back already in the shape everyone reads
     const [message] = await this.db.query<ChatMessage>(
-      `${MESSAGE_SQL} where m.id = $1`,
-      [row.id],
+      `with m as (
+         insert into event_messages (event_id, user_id, content)
+         values ($1, $2, $3)
+         returning id, event_id, user_id, content, created_at
+       )
+       select ${MESSAGE_FIELDS} from m join users u on u.id = m.user_id`,
+      [eventId, userId, content],
     );
     return message;
   }

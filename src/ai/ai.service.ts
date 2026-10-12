@@ -50,6 +50,21 @@ const MESSAGE_COLUMNS = `id, role, content, created_at as "createdAt"`;
 const CONVERSATION_LIST_LIMIT = 100;
 
 /**
+ * The most ai_messages.content holds (its check in migration 002). The model may write
+ * more (its token cap is far higher): the reply is cut here, while streaming, so what
+ * the user saw is exactly what gets saved — never lost to a failed insert at the end.
+ */
+export const MAX_REPLY_CHARS = 20_000;
+
+/** `text` cut to `max` UTF-16 units, without leaving half of a surrogate pair */
+function cutTo(text: string, max: number) {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const last = cut.charCodeAt(cut.length - 1);
+  return last >= 0xd800 && last <= 0xdbff ? cut.slice(0, -1) : cut;
+}
+
+/**
  * Conversations and messages. Every query about a conversation carries
  * "user_id = the signed-in user": someone else's conversation is simply not found
  * (404, the same answer as a wrong id — its existence isn't revealed).
@@ -149,8 +164,13 @@ export class AiService {
         signal,
       });
       for await (const chunk of chunks) {
-        text += chunk;
-        yield { type: 'delta', text: chunk };
+        const piece = cutTo(chunk, MAX_REPLY_CHARS - text.length);
+        if (piece) {
+          text += piece;
+          yield { type: 'delta', text: piece };
+        }
+        // Full: leaving the loop closes the model's stream, so no more is paid for
+        if (piece.length < chunk.length) break;
       }
       if (!text.trim()) throw new AiProviderError('unavailable');
     } catch (error) {

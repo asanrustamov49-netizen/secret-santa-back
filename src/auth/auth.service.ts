@@ -35,6 +35,9 @@ const DUMMY_HASH_PROMISE = hashPassword('dummy-password-for-timing');
 // Two tabs refreshing at the same moment is normal, not theft
 const REUSE_GRACE_MS = 30_000;
 
+/** Expired sessions are swept on roughly one new session in this many */
+const PURGE_EVERY = 100;
+
 /**
  * Lost a refresh race to another tab of the same browser: that tab already got
  * fresh cookies, so this response must not clear them (see AuthController.refresh).
@@ -369,6 +372,8 @@ export class AuthService {
       { sub: user.id, sid: session.id },
       { secret: env.jwtAccessSecret, expiresIn: env.accessTokenTtlSeconds },
     );
+
+    if (Math.random() * PURGE_EVERY < 1) void this.sessions.purgeExpired();
 
     return { user, accessToken, refreshToken };
   }

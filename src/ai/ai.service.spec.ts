@@ -10,7 +10,7 @@ import {
   type AiProvider,
   AiProviderError,
 } from './ai-provider';
-import { AiService, type ReplyEvent } from './ai.service';
+import { AiService, MAX_REPLY_CHARS, type ReplyEvent } from './ai.service';
 import type { DatabaseService } from '../database/database.service';
 
 // One reply turn against an in-memory stand-in for the two AI tables and a stub model.
@@ -176,6 +176,36 @@ describe('AiService.reply', () => {
       ['assistant', 'Here are ideas'],
     ]);
     expect(conversation.title).toBe('Gift ideas?');
+  });
+
+  it('cuts a reply longer than the database keeps, and stops the model there', async () => {
+    const chunk = 'x'.repeat(7_000);
+    const { service, messages } = setup({
+      reply: [chunk, chunk, chunk, chunk, chunk],
+    });
+    const events = await collect(
+      service.reply('owner', 'conv-1', 'Write a lot', 'en'),
+    );
+
+    const streamed = events
+      .filter((e) => e.type === 'delta')
+      .map((e) => e.text)
+      .join('');
+    expect(streamed).toHaveLength(MAX_REPLY_CHARS);
+    // What was shown is what was saved; the 4th and 5th chunks were never asked for
+    expect(messages.at(-1)).toMatchObject({
+      role: 'assistant',
+      content: streamed,
+    });
+    expect(events.filter((e) => e.type === 'delta')).toHaveLength(3);
+  });
+
+  it('never splits an emoji at the cut', async () => {
+    const { service, messages } = setup({
+      reply: ['a'.repeat(MAX_REPLY_CHARS - 1) + '🎁 more'],
+    });
+    await collect(service.reply('owner', 'conv-1', 'Hi', 'en'));
+    expect(messages.at(-1)!.content).toBe('a'.repeat(MAX_REPLY_CHARS - 1));
   });
 
   it('sends history, my recipient context and my language — nothing else', async () => {

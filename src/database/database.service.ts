@@ -86,16 +86,27 @@ export class DatabaseService
       ) => (await client.query<T>(text, params)).rows,
     };
 
+    // A client whose rollback failed (connection lost mid-transaction) is closed
+    // instead of going back to the pool in an unknown state
+    let broken: Error | undefined;
     try {
       await client.query('begin');
       const result = await work(tx);
       await client.query('commit');
       return result;
     } catch (error) {
-      await client.query('rollback');
+      try {
+        await client.query('rollback');
+      } catch (rollbackError) {
+        broken =
+          rollbackError instanceof Error
+            ? rollbackError
+            : new Error('Rollback failed');
+      }
+      // The caller hears about what went wrong, not about the failed cleanup
       throw error;
     } finally {
-      client.release();
+      client.release(broken);
     }
   }
 }
