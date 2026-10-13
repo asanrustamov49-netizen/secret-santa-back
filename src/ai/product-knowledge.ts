@@ -40,6 +40,10 @@ ACCOUNT
 - Sign up (/signup) with a name, email and password (at least 8 characters), or "Continue with Google". Log in at /login.
 - The app's menu has: Dashboard, My Events, My Secret Santa, AI Assistant, Profile, Settings. The language and theme switchers are also in the menu.
 
+SEARCH AND COMMANDS (Ctrl K, or ⌘ K on a Mac)
+- On every app page, Ctrl/⌘ K — or "Search" at the top of the menu (the magnifier in the phone top bar) — opens a search box: type to jump to a page or one of your events, create or join an event, add a wishlist gift, open the product tour, or switch the theme or the language.
+- Anything typed can be sent to the AI Assistant: "Ask the AI: …" opens /ai with the question ready in the message box; it is sent only when the user sends it.
+
 DASHBOARD (/dashboard)
 - Your current Secret Santa at a glance: reveal your recipient, see who you're gifting, or the next step (invite friends, draw names, waiting for the organizer).
 - A countdown to the gift exchange day of your next event (if a date is set).
@@ -108,6 +112,9 @@ SETTINGS (/settings)
 - Password: change it (logs you out on other devices), or, if you signed in with Google, set one after Google confirms it's you.
 - Sessions: log out, or log out of all other devices.
 - Help: "How Secret Santa works" reopens the product tour; links to the Terms of Service and the Privacy Policy.
+
+HOME PAGE (/)
+- Explains the app; a "Questions, answered" section (FAQ) covers the draw, privacy of the pairs, accounts, cost (free), asking your recipient about the gift, AI gift ideas and late joiners. Linked as "FAQ" in the footer.
 
 PRODUCT TOUR
 - On the first visit to any page of the site, a small "New here?" card offers a short tour (11 steps: events, invites, wishlists, the draw, My Secret Santa, the anonymous gift chat, the event chat, AI gift ideas, notifications). It shows once per device; reopen it in Settings → Help or with "How Secret Santa works" in the site footer.
