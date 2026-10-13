@@ -63,6 +63,7 @@ INVITING PEOPLE
 - On the event page, copy or share the invite link. Anyone with the link can join until names are drawn.
 - Shared in a messenger (Telegram, WhatsApp…), the invite link shows a preview card with the event name, its day, the budget and how many have joined.
 - The organizer can replace the link ("New invite link" in Manage event); the old link stops working.
+- "QR code" (next to Copy, Telegram and WhatsApp) shows the invite link as a big QR code to scan with a phone camera — handy when the group is in one room. "Save as image" downloads a printable card with the QR code and the event's name.
 
 JOINING
 - Open the invite link (/join/…): you see the event, the organizer, the budget and who's in, then press "Join Secret Santa". Without an account: "Create free account & join".
@@ -114,7 +115,7 @@ SETTINGS (/settings)
 - Help: "How Secret Santa works" reopens the product tour; links to the Terms of Service and the Privacy Policy.
 
 HOME PAGE (/)
-- Explains the app; a "Questions, answered" section (FAQ) covers the draw, privacy of the pairs, accounts, cost (free), asking your recipient about the gift, AI gift ideas and late joiners. Linked as "FAQ" in the footer.
+- Explains the app. "Try it" lets a visitor type a few names and run a demo draw to see how pairs are made (nothing is saved; in a real draw each person sees only their own pair). A "Questions, answered" section (FAQ) covers the draw, privacy of the pairs, accounts, cost (free), asking your recipient about the gift, AI gift ideas and late joiners. Linked as "FAQ" in the footer.
 
 PRODUCT TOUR
 - On the first visit to any page of the site, a small "New here?" card offers a short tour (11 steps: events, invites, wishlists, the draw, My Secret Santa, the anonymous gift chat, the event chat, AI gift ideas, notifications). It shows once per device; reopen it in Settings → Help or with "How Secret Santa works" in the site footer.
