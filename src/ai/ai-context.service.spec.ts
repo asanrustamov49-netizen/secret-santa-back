@@ -1,13 +1,10 @@
 import { jest } from '@jest/globals';
 
-/** A mock async function (typed loosely: these stand in for Nest services) */
 const asyncFn = () => jest.fn<(...args: unknown[]) => Promise<unknown>>();
 import { NotFoundException } from '@nestjs/common';
 import { AiContextService } from './ai-context.service';
 import type { EventsService } from '../events/events.service';
 import type { UsersService } from '../users/users.service';
-
-// The privacy rules of the assistant's context, against stand-ins for EventsService/UsersService.
 
 const EVENT = {
   id: 'event-1',
