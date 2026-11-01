@@ -3,21 +3,14 @@ import { env } from '../config/env';
 
 export const ACCESS_COOKIE = 'access_token';
 export const REFRESH_COOKIE = 'refresh_token';
-/**
- * Not a credential — just "a session probably exists", readable on every path
- * so the frontend proxy can decide between the app and /login without an API call.
- */
 export const SESSION_HINT_COOKIE = 'has_session';
 
-// httpOnly: JavaScript on the page can never read the tokens (XSS can't steal them).
-// sameSite=lax: not sent on cross-site POSTs (CSRF protection for our JSON API).
 const base: CookieOptions = {
   httpOnly: true,
   sameSite: 'lax',
   secure: env.isProduction,
 };
 
-// The refresh token only travels to /api/auth/*, never to regular API calls
 const refreshCookie: CookieOptions = { ...base, path: '/api/auth' };
 const accessCookie: CookieOptions = { ...base, path: '/' };
 
@@ -34,7 +27,6 @@ export function setAuthCookies(
     ...refreshCookie,
     maxAge: refreshMaxAge,
   });
-  // Readable by page JS on purpose — it holds no secret
   res.cookie(SESSION_HINT_COOKIE, '1', {
     ...accessCookie,
     httpOnly: false,
