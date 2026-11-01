@@ -43,8 +43,6 @@ import { ReauthService } from './reauth.service';
 const refreshTokenOf = (req: Request) =>
   (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE];
 
-// Frontend pages the Google flow lands on. `next` survives the round trip so the
-// user ends up where they were going (e.g. an invite link).
 const frontendCallbackUrl = (next: string) =>
   `${env.frontendUrl}/auth/callback?next=${encodeURIComponent(next)}`;
 
