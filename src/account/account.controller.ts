@@ -19,12 +19,6 @@ import { ChangePasswordDto, SetPasswordDto } from './dto/password.dto';
 import { UpdatePreferencesDto } from './dto/preferences.dto';
 import { PasswordService } from './password.service';
 
-/**
- * The signed-in user's own account settings — /api/account/*.
- * Kept apart from /profile, which is what other participants get to see.
- * Every route needs sign-in (global JwtAuthGuard); the user always comes from
- * the access token, never from the request body or URL.
- */
 @Controller('account')
 export class AccountController {
   constructor(
@@ -51,7 +45,6 @@ export class AccountController {
     return { user: toPublicUser(user) };
   }
 
-  /** Change the password: the current one proves it's you. Other devices are signed out. */
   @Post('password')
   @HttpCode(204)
   @RateLimit('sensitive')
@@ -62,10 +55,6 @@ export class AccountController {
     await this.password.change(me, dto.currentPassword, dto.newPassword);
   }
 
-  /**
-   * First password for a Google-only account. With no current password to check,
-   * a fresh Google confirmation (the reauth grant cookie) proves it's you.
-   */
   @Post('password/set')
   @HttpCode(200)
   @RateLimit('sensitive')
