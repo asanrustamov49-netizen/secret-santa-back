@@ -14,7 +14,6 @@ export class GoogleAuthGuard extends AuthGuard('google') {
   private readonly logger = new Logger(GoogleAuthGuard.name);
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Not configured → no strategy registered; the handler reports the error
     if (!env.google) return true;
     return (await super.canActivate(context)) as boolean;
   }
