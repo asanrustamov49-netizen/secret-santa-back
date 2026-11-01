@@ -20,7 +20,6 @@ import type { AiPage } from './product-knowledge';
 
 export interface AiConversation {
   id: string;
-  /** null: a general conversation about the app */
   eventId: string | null;
   eventName: string | null;
   title: string | null;
@@ -35,7 +34,6 @@ export interface AiMessage {
   createdAt: Date;
 }
 
-/** Streamed to the browser while a reply is written */
 export type ReplyEvent =
   | { type: 'delta'; text: string }
   | { type: 'done'; userMessage: AiMessage; message: AiMessage };

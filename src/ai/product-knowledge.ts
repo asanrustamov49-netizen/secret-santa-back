@@ -3,7 +3,6 @@
 // does (checked against the frontend and the API); no internals, no secrets. When a
 // feature changes, change this text with it.
 
-/** Where the user is: a fixed list of app pages, never a free-form path */
 export const AI_PAGES = [
   'dashboard',
   'events',
