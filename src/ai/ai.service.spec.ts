@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 
-/** A mock async function (typed loosely: these stand in for Nest services) */
 const asyncFn = () => jest.fn<(...args: unknown[]) => Promise<unknown>>();
 import { NotFoundException } from '@nestjs/common';
 import type { AiContextService } from './ai-context.service';
@@ -12,9 +11,6 @@ import {
 } from './ai-provider';
 import { AiService, MAX_REPLY_CHARS, type ReplyEvent } from './ai.service';
 import type { DatabaseService } from '../database/database.service';
-
-// One reply turn against an in-memory stand-in for the two AI tables and a stub model.
-// No database, no network: the real SQL is exercised by test/ai.e2e-spec.ts.
 
 const CONTEXT: AiContext = {
   user: { name: 'Aigerim', interests: ['Tea'] },
