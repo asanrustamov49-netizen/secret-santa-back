@@ -15,13 +15,10 @@ import {
   type AiTurn,
 } from '../ai-provider';
 
-/** Google's recommended default model, on the free tier (models overview + pricing, checked 2026-09-28) */
 export const GEMINI_MODEL = 'gemini-3.8-flash';
 
-/** Gift ideas are short; room for the model's thinking plus a full answer */
 const MAX_OUTPUT_TOKENS = 16_000;
 
-/** The model stopped because of its safety rules: the user sees "can't help with that" */
 const REFUSALS = new Set<FinishReason>([
   FinishReason.SAFETY,
   FinishReason.PROHIBITED_CONTENT,
@@ -29,7 +26,6 @@ const REFUSALS = new Set<FinishReason>([
   FinishReason.SPII,
 ]);
 
-/** Gemini through the official Google Gen AI SDK (@google/genai), streamed */
 @Injectable()
 export class GeminiProvider implements AiProvider {
   private readonly logger = new Logger(GeminiProvider.name);
@@ -47,7 +43,6 @@ export class GeminiProvider implements AiProvider {
         config: {
           systemInstruction: system,
           maxOutputTokens: MAX_OUTPUT_TOKENS,
-          // Low thinking keeps a chat reply quick; gift ideas don't need deep reasoning
           thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
           abortSignal: signal,
         },
@@ -60,18 +55,13 @@ export class GeminiProvider implements AiProvider {
     }
   }
 
-  /** Created on first use, so the app starts without a key */
   private getClient(): GoogleGenAI {
     if (!env.geminiApiKey) throw new AiProviderError('not_configured');
-    // The key is passed explicitly (never picked up from GOOGLE_API_KEY & co. by accident),
-    // and vertexai: false pins the Gemini Developer API whatever the environment says
     this.client ??= new GoogleGenAI({
       apiKey: env.geminiApiKey,
       vertexai: false,
       httpOptions: {
         timeout: 60_000, // per attempt
-        // Retries 408/5xx ("high demand" is a 503) before the stream starts. Not 429:
-        // an exhausted quota stays exhausted, and every retry spends it again
         retryOptions: {
           attempts: 3,
           httpStatusCodes: [408, 500, 502, 503, 504],
@@ -81,10 +71,6 @@ export class GeminiProvider implements AiProvider {
     return this.client;
   }
 
-  /**
-   * SDK errors → AiFailure. Logged by class, HTTP status and a fixed reason only — never
-   * the SDK's message itself (it can hold reply text): no key, no prompt, no user text.
-   */
   private toProviderError(
     error: unknown,
     signal?: AbortSignal,

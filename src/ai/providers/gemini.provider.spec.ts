@@ -4,10 +4,6 @@ import { env } from '../../config/env';
 import { type AiChatRequest, AiProviderError } from '../ai-provider';
 import { GEMINI_MODEL, GeminiProvider } from './gemini.provider';
 
-// The real @google/genai SDK with a stand-in for fetch: its request building, stream
-// parsing, retries and ApiError are exercised, and no request ever leaves the machine.
-
-/** Fake, and distinctive, so a leak into logs or errors is easy to spot */
 const KEY = 'unit-test-fake-gemini-key-000';
 
 const REQUEST: AiChatRequest = {
@@ -24,7 +20,6 @@ let fetchMock: jest.Mock<FetchFn>;
 const realFetch = globalThis.fetch;
 let warn: jest.SpiedFunction<Logger['warn']>;
 
-/** A streamed answer: one server-sent event per chunk */
 const sseResponse = (chunks: object[]) =>
   new Response(
     chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join(''),
@@ -56,7 +51,6 @@ async function collect(request: AiChatRequest = REQUEST) {
   return out;
 }
 
-/** The AiFailure the stream ends with */
 async function failureOf(request: AiChatRequest = REQUEST) {
   try {
     await collect(request);
@@ -77,7 +71,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // Nothing the provider logged may carry the key
   for (const call of warn.mock.calls) {
     expect(JSON.stringify(call)).not.toContain(KEY);
   }
@@ -161,7 +154,6 @@ describe('GeminiProvider', () => {
   });
 
   it('reports a stream cut off mid-reply as unavailable — the reply text never reaches the log', async () => {
-    // What Google sends under load: a streamed answer, then an error the SDK can't read
     fetchMock.mockResolvedValue(
       new Response(
         `data: ${JSON.stringify(textChunk('secret reply text '))}\n\n{"error": {"code": 503, "status": "UNAVAILABLE"`,
@@ -175,8 +167,6 @@ describe('GeminiProvider', () => {
   });
 
   it('maps a timeout to timeout', async () => {
-    // What fetch throws when the SDK's per-attempt timeout fires. Built as an Error of
-    // this realm: Jest's sandbox doesn't see Node's DOMException as an Error
     fetchMock.mockRejectedValue(
       Object.assign(new Error('The operation timed out.'), {
         name: 'TimeoutError',
