@@ -11,12 +11,6 @@ import { hashPassword, verifyPassword } from '../auth/password';
 import { SessionsService } from '../auth/sessions.service';
 import { toPublicUser, UsersService } from '../users/users.service';
 
-/**
- * Changing or setting the account password. Either way the new hash and the
- * end of every *other* session commit together: whoever might have known the
- * old credentials loses their sessions, while this device stays signed in.
- * (Other devices' access tokens still run out on their own — at most 15 min.)
- */
 @Injectable()
 export class PasswordService {
   constructor(
@@ -37,14 +31,11 @@ export class PasswordService {
         "This account doesn't have a password yet — set one instead",
       );
     }
-    // Compares two inputs, reveals nothing about the stored one
     if (newPassword === currentPassword) {
       throw new BadRequestException(
         'New password must be different from the current one',
       );
     }
-    // 403, not 401: a wrong password here is not an expired session, and a 401
-    // would make the browser client refresh and replay the guess
     if (!(await verifyPassword(currentPassword, user.passwordHash))) {
       throw new ForbiddenException('Current password is incorrect');
     }
@@ -52,13 +43,11 @@ export class PasswordService {
     await this.replacePassword(me, newPassword);
   }
 
-  /** First password of a Google-only account; the caller has checked the reauth grant */
   async setFirst(me: AuthUser, newPassword: string) {
     await this.assertHasNoPassword(me.id);
     return toPublicUser(await this.replacePassword(me, newPassword));
   }
 
-  /** Throws unless the account has no password yet */
   async assertHasNoPassword(userId: string) {
     const user = await this.users.findById(userId);
     if (!user) throw new NotFoundException('Account not found');
