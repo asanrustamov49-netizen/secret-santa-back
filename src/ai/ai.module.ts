@@ -34,7 +34,6 @@ const PROVIDERS = {
 })
 export class AiModule implements OnModuleInit {
   onModuleInit() {
-    // Which model answers, and whether it can — never the key itself
     const configured = PROVIDERS[env.aiProvider].hasKey();
     new Logger('AiModule').log(
       `AI provider: ${env.aiProvider}${configured ? '' : ' (no API key — the assistant answers "unavailable")'}`,

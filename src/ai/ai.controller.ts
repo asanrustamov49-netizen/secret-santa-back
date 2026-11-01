@@ -19,11 +19,6 @@ import { CreateConversationDto, SendMessageDto } from './dto/ai.dto';
 
 const ConversationId = () => Param('id', ParseUUIDPipe);
 
-/**
- * The AI assistant — /api/ai/conversations: general ones about the app, and ones
- * about an event. Signed-in only (global JwtAuthGuard); ownership is checked in
- * AiService on every call.
- */
 @Controller('ai/conversations')
 export class AiController {
   constructor(private readonly ai: AiService) {}
