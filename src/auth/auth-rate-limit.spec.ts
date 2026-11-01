@@ -15,12 +15,9 @@ import {
   signClientIp,
 } from './client-ip';
 
-// The guard reads env on every call: a known secret and small limits for these tests
 const SECRET = 'unit-test-client-ip-secret';
 env.clientIpSigningSecret = SECRET;
 env.authRateLimits.login = { limit: 3, unverifiedLimit: 2, windowSeconds: 900 };
-
-// The guard on /auth/login and /auth/register, against a stand-in for the PostgreSQL counter.
 
 class Routes {
   @AuthRateLimit('login')

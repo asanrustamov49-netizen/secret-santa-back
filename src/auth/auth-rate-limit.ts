@@ -16,20 +16,6 @@ import { env } from '../config/env';
 import { DatabaseService } from '../database/database.service';
 import { inspectClientIp, ipBucketKey } from './client-ip';
 
-/**
- * Limits for the two public routes that run scrypt: /auth/login and /auth/register.
- *
- * Counted in PostgreSQL (auth_rate_limits, migration 007), so every API instance
- * shares one count. The key is the visitor's IP only when the Next.js proxy signed
- * it (see client-ip.ts); everything else — e.g. calls made straight to the API host —
- * shares one strict "unverified" bucket per route.
- *
- * If the count can't be taken, the sign-in is refused with a plain 503 — with one
- * exception: the table itself is missing (migration 007 not applied). That is a set-up
- * mistake, not an attack, and refusing would lock everybody out of the app; so the request
- * goes on without the limit and an error is logged every minute until 007 is applied.
- * The per-email lockout in AuthService.login and the scrypt queue (password.ts) still apply.
- */
 export type AuthAction = 'login' | 'register';
 
 const AUTH_RATE_LIMIT_KEY = 'authRateLimit';
