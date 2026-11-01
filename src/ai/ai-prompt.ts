@@ -6,12 +6,8 @@ import {
   PRODUCT_KNOWLEDGE,
 } from './product-knowledge';
 
-// Pure helpers: what the model is told, and how much history it sees. No I/O — unit tested.
-
-/** The event a conversation is about — only what every participant already sees */
 export interface EventContext {
   name: string;
-  /** YYYY-MM-DD */
   date: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
@@ -19,11 +15,9 @@ export interface EventContext {
   status: 'open' | 'drawn' | 'completed';
   iAmOrganizer: boolean;
   participantCount: number;
-  /** My own Secret Santa here: names not drawn yet / drawn but I haven't opened it / opened */
   mySecretSanta: 'not_drawn' | 'not_opened' | 'opened';
 }
 
-/** Only ever the user's own recipient, and only once they have opened the match */
 export interface RecipientContext {
   name: string;
   interests: string[];
@@ -34,21 +28,12 @@ export interface RecipientContext {
   }[];
 }
 
-/**
- * Everything the model learns about the user's Secret Santa — and nothing more. Built
- * field by field (never by spreading a row), so a column added elsewhere can't leak in.
- * It holds no ids, no emails, no other participants and no other pairs.
- * - general conversation: event and recipient are null
- * - event conversation:   event is set; recipient only once my match is open
- */
 export interface AiContext {
-  /** The signed-in user */
   user: { name: string; interests: string[] };
   event: EventContext | null;
   recipient: RecipientContext | null;
 }
 
-/** What the assistant can do in a conversation — also what the chat header shows */
 export type AiContextState = 'general' | 'not_drawn' | 'not_revealed' | 'ready';
 
 export function contextState(context: AiContext): AiContextState {
@@ -59,11 +44,6 @@ export function contextState(context: AiContext): AiContextState {
     : 'not_revealed';
 }
 
-/**
- * The only UI actions the assistant may offer — as a button the user presses, never
- * applied by itself. Mirrored by the frontend (lib/ai/actions.ts), which ignores any
- * marker outside this list.
- */
 export const AI_ACTIONS = [
   'theme:light',
   'theme:dark',
