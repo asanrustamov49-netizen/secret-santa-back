@@ -7,9 +7,6 @@ import {
 } from '../../auth/dto/auth.dto';
 import { RawValue } from '../../common/validation/raw-value';
 
-// Same rules for new passwords as at sign-up. @RawValue: a number must not sneak
-// through as a password via the pipe's implicit type conversion.
-
 /** POST /account/password */
 export class ChangePasswordDto {
   @RawValue()

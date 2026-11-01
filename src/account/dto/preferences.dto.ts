@@ -4,13 +4,8 @@ import type { ThemePreference } from '../../users/users.service';
 
 export const THEME_PREFERENCES: ThemePreference[] = ['light', 'dark', 'system'];
 
-/** Present fields are validated; `null` is rejected rather than read as "no change" */
 const sent = (_: object, value: unknown) => value !== undefined;
 
-/**
- * PATCH /account/preferences — send only what changes, at least one field.
- * Unknown fields are rejected by the global pipe (forbidNonWhitelisted).
- */
 export class UpdatePreferencesDto {
   @ValidateIf(sent)
   @RawValue()
