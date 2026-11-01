@@ -18,16 +18,11 @@ import { SessionsService } from './sessions.service';
     AuthService,
     SessionsService,
     ReauthService,
-    // Shared sign-in / sign-up limits (@AuthRateLimit on /auth/login and /auth/register)
     AuthRateLimitService,
     AuthRateLimitGuard,
-    // Every route in the app requires sign-in unless marked @Public()
     { provide: APP_GUARD, useClass: JwtAuthGuard },
-    // Without credentials there is no strategy; /auth/google then reports ?error=google
     ...(env.google ? [GoogleStrategy] : []),
   ],
-  // Reused by account features: ending sessions (password change, deletion)
-  // and the Google re-authentication grant (setting a first password)
   exports: [SessionsService, ReauthService],
 })
 export class AuthModule {}

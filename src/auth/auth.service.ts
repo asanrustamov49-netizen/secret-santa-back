@@ -28,11 +28,8 @@ export interface Session {
   refreshToken: string;
 }
 
-// Verified against when the email doesn't exist, so "no such user" and
-// "wrong password" take the same time and can't be told apart.
 const DUMMY_HASH_PROMISE = hashPassword('dummy-password-for-timing');
 
-// Two tabs refreshing at the same moment is normal, not theft
 const REUSE_GRACE_MS = 30_000;
 
 /** Expired sessions are swept on roughly one new session in this many */
