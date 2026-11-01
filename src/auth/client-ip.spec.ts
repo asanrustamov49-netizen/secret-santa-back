@@ -8,8 +8,6 @@ import {
   verifyClientIp,
 } from './client-ip';
 
-// The trust rules for the visitor's IP: only a fresh signature made with our secret counts.
-
 const SECRET = 'unit-test-client-ip-secret';
 const NOW = 1_800_000_000_000; // ms
 const NOW_S = NOW / 1000;

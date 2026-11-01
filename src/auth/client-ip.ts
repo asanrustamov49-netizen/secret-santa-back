@@ -19,12 +19,10 @@ import { isIP } from 'node:net';
 export const CLIENT_IP_HEADER = 'x-santa-client-ip';
 export const CLIENT_IP_SIGNATURE_HEADER = 'x-santa-client-ip-sig';
 
-/** How far the signature's timestamp may be from now, either way (clock skew + transit) */
 export const SIGNATURE_MAX_AGE_SECONDS = 60;
 
 const SIGNATURE = /^(\d{1,12})\.([A-Za-z0-9_-]{43})$/;
 
-/** What is signed — the same string the frontend builds (src/lib/security/clientIp.ts) */
 const payload = (timestamp: number, ip: string) => `v1\n${timestamp}\n${ip}`;
 
 export function signClientIp(ip: string, timestamp: number, secret: string) {
@@ -77,7 +75,6 @@ export function inspectClientIp(
   if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) {
     return refuse('invalid');
   }
-  // Checked after the signature: only a genuine but old one counts as "expired"
   if (Math.abs(nowMs / 1000 - timestamp) > SIGNATURE_MAX_AGE_SECONDS) {
     return refuse('expired');
   }
@@ -96,7 +93,6 @@ export function verifyClientIp(
   return inspectClientIp(headers, secret, nowMs).ip;
 }
 
-/** "1:2::3" → its 8 groups as numbers; an embedded IPv4 tail counts as two groups */
 function ipv6Groups(ip: string): number[] {
   let address = ip.toLowerCase().split('%')[0];
   const v4 = /(\d+\.\d+\.\d+\.\d+)$/.exec(address);
