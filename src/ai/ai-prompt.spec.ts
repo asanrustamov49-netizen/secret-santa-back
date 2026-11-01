@@ -38,7 +38,6 @@ const general: AiContext = {
   recipient: null,
 };
 
-/** The JSON inside one data block of the prompt */
 function dataOf(prompt: string, tag: string): unknown {
   const start = prompt.indexOf(`<${tag}>\n`);
   const end = prompt.indexOf(`\n</${tag}>`);
@@ -139,7 +138,6 @@ describe('historyWindow', () => {
   });
 
   it('always starts with a user turn', () => {
-    // 22 turns → the last 20 would start with an assistant turn
     const window = historyWindow(turns(22));
     expect(window[0].role).toBe('user');
   });

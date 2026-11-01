@@ -1,7 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { type AiFailure, AiProviderError } from './ai-provider';
 
-/** What the browser learns about a failed AI call: a code the UI words itself, never provider details */
 export type AiErrorCode =
   'ai_unavailable' | 'ai_busy' | 'ai_timeout' | 'ai_refused';
 
@@ -9,7 +8,6 @@ const ERRORS: Record<
   Exclude<AiFailure, 'aborted'>,
   [status: number, code: AiErrorCode, message: string]
 > = {
-  // A missing or rejected key is our configuration problem — the user just sees "unavailable"
   not_configured: [
     503,
     'ai_unavailable',
@@ -36,7 +34,6 @@ export function aiErrorCode(error: unknown): AiErrorCode {
   return 'ai_unavailable';
 }
 
-/** For errors before the stream starts: provider failures become a JSON error with a code; others pass through */
 export function toHttpError(error: unknown): unknown {
   if (!(error instanceof AiProviderError) || error.failure === 'aborted')
     return error;
